@@ -66,12 +66,18 @@ def _save_content(soup, original_url, base_url, out_file):
         image_src = image_item.attrs.get('src', None)
         if image_src is None:
             continue
-        image_src = base_url + image_src
+        if image_src.startswith('//'):
+            image_src = 'http:' + image_src
+        elif image_src.startswith('/'):
+            image_src = base_url + image_src
+        if not image_src.endswith('.png') and not image_src.endswith('.jpg'):
+            continue
         if image_src in images:
             continue
+        print(image_src)
         images.append(image_src)
-    # for image_src in images:
-    #   result += '<p><img src="{}" width="60%"/></p>'.format(image_src)
+    for image_src in images:
+        result += '<p><img src="{}" width="60%"/></p>'.format(image_src)
     result = result.replace('Advertisement: Replay AdAds by ZINC', '')
     result += '</body></html>'
     file_utils.write_file(out_file, result.encode('utf8'))
